@@ -19,9 +19,13 @@ RUN apk add --no-cache --no-interactive php81-zip php81-xsl php81-xmlwriter \
     php81-gettext php81-gd php81-ftp php81-fpm php81-fileinfo php81-ffi \
     php81-exif php81-enchant php81-embed php81-dom php81-dba php81-curl \
     php81-ctype php81-common php81-cgi php81-calendar php81-bz2 php81-brotli \
-    php81-bcmath php81 bash composer icu-data-full nginx
+    php81-bcmath php81 bash composer icu-data-full nginx doas
 
+RUN addgroup -g ${POOL_GID} app
+RUN adduser -h /home/app -G app -u ${POOL_UID} -s /bin/bash -D app
 RUN mkdir -p /home/www/public /run/php && chown ${POOL_UID}:${POOL_GID} /home/www -R
+RUN echo 'permit app as root' >> /etc/doas.d/doas.conf
+RUN echo 'permit nopass app as root' >> /etc/doas.d/doas.conf
 
 EXPOSE 80
 
@@ -31,5 +35,8 @@ COPY policy.xml /etc/ImageMagick-7/policy.xml
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY default.conf /etc/nginx/http.d/default.conf
 COPY entrypoint /entrypoint
+
+USER app
+WORKDIR /home/www
 
 ENTRYPOINT [ "sh", "/entrypoint" ]
