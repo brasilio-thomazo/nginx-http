@@ -1,0 +1,3 @@
+#!/bin/bash
+
+nginx & /usr/sbin/php-fpm81 -e -y /etc/php81/php-fpm.conf
